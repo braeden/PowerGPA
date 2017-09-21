@@ -79,16 +79,17 @@ for(var i = 0; i < gradesArray.length; i++) {
     if (j==courseRow) {
       var re = new RegExp(patternAP.join("|"), "i");
       if (re.test(gradesArray[i][j])) {
-        weighting = 1;
+        weighting = 0.67;
       }
       re = new RegExp(patternH.join("|"), "i");
       if (re.test(gradesArray[i][j])) {
-        weighting = 0.5;
+        weighting = 0.33;
       }
       getGrades(i,weighting);
     }
   }
 }
+console.log(qOneGpas)
 
 averageGPA();
 
@@ -103,7 +104,6 @@ function getGrades(rowIndex, weighting) {
   } else {
     qOneGpas.push(-1);
   }
-
 }
 
 function calculateClassGPA(letterGrade, weighting) {
@@ -121,6 +121,7 @@ function calculateClassGPA(letterGrade, weighting) {
       g+=weighting;
     }
   }
+  console.log(g);
   return(g);
 
 }

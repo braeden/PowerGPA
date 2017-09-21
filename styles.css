@@ -1,0 +1,13 @@
+.gpa {
+	text-align: center;
+
+	margin-left:40%;
+	margin-right:40%;
+	padding-bottom: 10px;
+	padding-top:10px;
+	font-size: 20px;
+}
+#gpaTitle {
+	font-size: 30px;
+	font-weight: bold;
+}

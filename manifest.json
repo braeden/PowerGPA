@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+
+  "name": "PowerGPA",
+  "description": "This extension calculates your current GPA",
+  "version": "0.1",
+  "browser_action": {"default_icon": "smallicon.png"},
+  "icons": {
+    "128": "icon.png",
+    "48": "smallicon.png",
+    "16": "smallicon.png"
+  },
+  "content_scripts": [{
+    "js": ["jquery-3.2.1.min.js", "content.js"],
+    "css": ["styles.css"],
+    "matches": ["https://*.org/guardian/home.html"]
+  }]
+}

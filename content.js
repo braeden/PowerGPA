@@ -68,8 +68,10 @@ var semTwoGpas = [];
 
 var weighting=0;
 
-var patternAP = ["A.P.", "AP", "Calculus"]
+var patternAP = ["A.P.", "AP", "Calculus", "Diff"]
 var patternH = [" Honors", "[0-9]H"]
+var patternB = [" B", "[0-9]B"]
+var patternC = [" C", "[0-9]C"]
 
 
 for(var i = 0; i < gradesArray.length; i++) {
@@ -84,6 +86,14 @@ for(var i = 0; i < gradesArray.length; i++) {
       re = new RegExp(patternH.join("|"), "i");
       if (re.test(gradesArray[i][j])) {
         weighting = 0.33;
+      }
+      re = new RegExp(patternB.join("|"), "i");
+      if (re.test(gradesArray[i][j])) {
+        weighting = -0.33;
+      }
+      re = new RegExp(patternC.join("|"), "i");
+      if (re.test(gradesArray[i][j])) {
+        weighting = -0.66;
       }
       getGrades(i,weighting);
     }

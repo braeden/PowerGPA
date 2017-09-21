@@ -71,7 +71,7 @@ var weighting=0;
 var patternAP = ["A.P.", "AP", "Calculus", "Diff"]
 var patternH = [" Honors", "[0-9]H", "HNRS"]
 var patternB = [" B", "[0-9]B"]
-var patternC = [" C", "[0-9]C"]
+var patternC = ["Algebra C", "[0-9]C"]
 
 
 for(var i = 0; i < gradesArray.length; i++) {

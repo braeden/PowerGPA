@@ -1,5 +1,5 @@
 $("#afterH1").append("<div class='gpa'></div>")
-$(".gpa").append("<p id='gpaTitle'>GPA:</p>");
+$(".gpa").append("<p id='gpaTitle'>GPA (W):</p>");
 var gradesArray = [];
 var headerArray = [];
 
@@ -20,15 +20,7 @@ $("tbody:first tr").each(function() {
     }
 });
 
-var courseRow = 11;
-var qOneRow = 12;
-var qTwoRow = 14;
-var qThreeRow = 16;
-var qFourRow = 18;
-var semOneRow = 15;
-var semTwoRow = 19;
-
-
+/*
 for(var j = 0; j < headerArray[1].length; j++) {
   //headerArray[j][1]
   if (typeof headerArray[1][j] != 'undefined') {
@@ -56,63 +48,63 @@ for(var j = 0; j < headerArray[1].length; j++) {
     }
   }
 }
+*/
 
+var courseRow = 11;
 
-
-var qOneGpas = [];
-var qTwoGpas = [];
-var qThreeGpas = [];
-var qFourGpas = [];
-var semTwoGpas = [];
-
+var colIndexArray = [12,14,16,18,15,19];
+//Course,Q1,Q2,Q3,Q4,S1,S2
+var gpaArrays = [[]]; //2d array
+//Q1,Q2,Q3,Q4,S1,S2
 
 var weighting=0;
 
-var patternAP = ["A.P.", "AP", "Calculus", "Diff"]
-var patternH = [" Honors", "[0-9]H", "HNRS"]
-var patternB = [" B", "[0-9]B"]
-var patternC = ["Algebra C", "[0-9]C"]
+var pattern = [
+  ["A.P.", "AP", "Calculus", "Diff"],
+  [" Honors", "[0-9]H"],
+  ["[0-9]A", "Contemp"], //Not necessary - for programatic weight reduction
+  [" B", "[0-9]B"],
+  ["Algebra C", "[0-9]C"]
+]
 
 
 for(var i = 0; i < gradesArray.length; i++) {
   for(var j = 0; j < gradesArray[i].length; j++) {
     weighting=0;
-
-    if (j==courseRow) {
-      var re = new RegExp(patternAP.join("|"), "i");
-      if (re.test(gradesArray[i][j])) {
-        weighting = 0.67;
+    for (var k = 0; k<colIndexArray.length; k++) {
+      if (j==colIndexArray[k]) {
+        var storageIndex = k;
+        var col = j;
+        for (var p = 0; p<pattern.length; p++) {
+          var re = new RegExp(pattern[p].join("|"), "i");
+          if (re.test(gradesArray[i][courseRow])) {
+            weighting = 0.667-0.333*p;
+          }
+        }
+        getGrades(i,weighting,col,storageIndex);
       }
-      re = new RegExp(patternH.join("|"), "i");
-      if (re.test(gradesArray[i][j])) {
-        weighting = 0.33;
-      }
-      re = new RegExp(patternB.join("|"), "i");
-      if (re.test(gradesArray[i][j])) {
-        weighting = -0.33;
-      }
-      re = new RegExp(patternC.join("|"), "i");
-      if (re.test(gradesArray[i][j])) {
-        weighting = -0.66;
-      }
-      getGrades(i,weighting);
     }
   }
 }
-console.log(qOneGpas)
 
 averageGPA();
 
-function getGrades(rowIndex, weighting) {
+console.log(gpaArrays)
+
+function getGrades(rowIndex, weighting, col, storageIndex) {
   //Q1
-
-  if (gradesArray[rowIndex][qOneRow].match(/\d+/g) != null) {
+//olIndexArray[storageIndex]
+  if (typeof gpaArrays[storageIndex] == 'undefined') {
+    gpaArrays[storageIndex] = new Array();
+  }
+  //console.log(rowIndex, col);
+  if (gradesArray[rowIndex][col].match(/\d+/g) != null) {
     //Contains grades
-    letterGrade = gradesArray[rowIndex][qOneRow].toString().replace(/[^A-Z+-]/g,'');
-    qOneGpas.push(calculateClassGPA(letterGrade, weighting));
-
+    //StorageIndex = where in the GPA array to store, and which index in the columnarray to grab from
+    letterGrade = gradesArray[rowIndex][col].toString().replace(/[^A-Z+-]/g,'');
+    gpaArrays[storageIndex].push(calculateClassGPA(letterGrade, weighting));
   } else {
-    qOneGpas.push(-1);
+    gpaArrays[storageIndex].push(-1);
   }
 }
 
@@ -131,33 +123,33 @@ function calculateClassGPA(letterGrade, weighting) {
       g+=weighting;
     }
   }
-  console.log(g);
+  //console.log(g);
   return(g);
 
 }
 
 function averageGPA() {
   //Q1
-
-  var l = qOneGpas.length;
-  var classTotal = 0;
-  var GpaTotal = 0.0;
-  for (var i=0; i<l; i++) {
-    if (qOneGpas[i] != -1) {
-      GpaTotal+=qOneGpas[i];
-      classTotal++;
+  for (var g=0; g<gpaArrays.length; g++) {
+    var l = gpaArrays[g].length;
+    var classTotal = 0;
+    var GpaTotal = 0.0;
+    for (var i=0; i<l; i++) {
+      if (gpaArrays[g][i] != -1) {
+        GpaTotal+=gpaArrays[g][i];
+        classTotal++;
+      }
+    }
+    var average = GpaTotal/classTotal;
+    if (GpaTotal>0) {
+      displayGPA(headerArray[1][colIndexArray[g]-8].toString(), average);
     }
   }
-  var average = GpaTotal/classTotal;
-  if (GpaTotal>0) {
-    displayGPA(headerArray[1][qOneRow-8].toString(), average);
-  }
-  
 }
 
 function displayGPA(name, gpa) {
   gpa = gpa.toFixed(2);
-  $(".gpa").append("<bold>"+ name + "</bold>: " + gpa)
+  $(".gpa").append(name + ": " + gpa + "</br>")
 }
 //j = col
 //i= row

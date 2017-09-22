@@ -32,14 +32,15 @@ var gpaArrays = [[]]; //2d array
 var weighting=0;
 
 for(var j = 0; j < headerArray[1].length; j++) {
-   if (typeof headerArray[1][j] != 'undefined') {
-    for (var h = 0; h < headers.length; h++) {
-        if (headerArray[1][j].toString().replace(/\s/g) == headers[h]) {
-            colIndexArray[h] = j+offsetCount; //Day count offset in table
+    if (typeof headerArray[1][j] != 'undefined') {
+        for (var h = 0; h < headers.length; h++) {
+            if (headerArray[1][j].toString().replace(/\s/g) == headers[h]) {
+                colIndexArray[h] = j+offsetCount; //Day count offset in table
+            }
         }
-    }
-    if (headerArray[1][j].toString().replace(/\s/g) == "Course") {
-        courseRow = j+offsetCount;
+        if (headerArray[1][j].toString().replace(/\s/g) == "Course") {
+            courseRow = j+offsetCount;
+        }
     }
 }
 

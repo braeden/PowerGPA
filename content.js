@@ -20,44 +20,31 @@ $("tbody:first tr").each(function() {
     }
 });
 
-/*
-for(var j = 0; j < headerArray[1].length; j++) {
-  //headerArray[j][1]
-  if (typeof headerArray[1][j] != 'undefined') {
-    switch(headerArray[1][j].toString().replace(/\s/g)) {
-      case "Course":
-        courseRow = j+8;
-        break;
-      case "Q1":
-        qOneRow = j+8;
-        break;
-      case "Q2":
-        qTwoRow = j+8;
-        break;
-      case "Q3":
-        qThreeRow = j+8;
-        break;
-      case "Q4":
-        qFourRow = j+8;
-        break;
-      case "S1":
-        semOneRow = j+8;
-        break;
-      case "S2":
-        semTwoRow = j+8;
-    }
-  }
-}
-*/
-
-var courseRow = 11;
-
-var colIndexArray = [12,14,16,18,15,19];
+var headers = ["Q1","Q2","Q3","Q4","S1","S2"]; //To access the column values from
+var colIndexArray = [12,14,16,18,15,19]; //Default 
 //Course,Q1,Q2,Q3,Q4,S1,S2
+var courseRow = 11; //Default
+var offsetCount = 8;
+
 var gpaArrays = [[]]; //2d array
 //Q1,Q2,Q3,Q4,S1,S2
 
 var weighting=0;
+
+for(var j = 0; j < headerArray[1].length; j++) {
+   if (typeof headerArray[1][j] != 'undefined') {
+    for (var h = 0; h < headers.length; h++) {
+        if (headerArray[1][j].toString().replace(/\s/g) == headers[h]) {
+            colIndexArray[h] = j+offsetCount; //Day count offset in table
+        }
+    }
+    if (headerArray[1][j].toString().replace(/\s/g) == "Course") {
+        courseRow = j+offsetCount;
+    }
+}
+
+
+
 
 var pattern = [
   ["A.P.", "AP", "Calculus", "Diff"],

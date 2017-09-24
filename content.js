@@ -56,7 +56,6 @@ var pattern = [
   ["Algebra C", "[0-9]C"]
 ]
 
-var excludePattern = [""]
 
 for(var i = 0; i < gradesArray.length; i++) {
   for(var j = 0; j < gradesArray[i].length; j++) {
@@ -68,9 +67,9 @@ for(var i = 0; i < gradesArray.length; i++) {
         for (var p = 0; p<pattern.length; p++) {
           var re = new RegExp(pattern[p].join("|"), "i");
           if (re.test(gradesArray[i][courseRow])) {
-            weighting = 0.667-0.333*p;
+            weighting = 0.666-0.333*p;
           }
-        }
+        } //AP=include in weighting //
         getGrades(i,weighting,col,storageIndex);
       }
     }
@@ -148,7 +147,7 @@ function averageGPA() {
 function displayGPA(name, gpa, gpaUw) {
   gpa = gpa.toFixed(2);
   gpaUw = gpaUw.toFixed(2);
-  $(".gpa").append("<span>" + name + ": " + gpa + "/" + gpaUw + "</span></br>");
+  $(".gpa").append("<span tabindex='0'>" + name + ": " + gpa + "/" + gpaUw + "</span></br>");
 }
 //j = col
 //i= row

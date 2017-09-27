@@ -20,8 +20,8 @@ $("tbody:first tr").each(function() {
     }
 });
 
-var headers = ["Q1","Q2","Q3","Q4","S1","S2"]; //To access the column values from
-var colIndexArray = [12,14,16,18,15,19]; //Default 
+var headers = ["Q1","Q2","Q3","Q4","S1","S2","F1"]; //To access the column values from
+var colIndexArray = [12,14,16,18,15,19,20]; //Default 
 //Course,Q1,Q2,Q3,Q4,S1,S2
 var courseRow = 11; //Default
 var offsetCount = 8;
@@ -52,7 +52,7 @@ var pattern = [
   ["A.P.", "AP", "Calculus", "Diff"],
   [" Honors", "[0-9]H"],
   ["[0-9]A", "Contemp"], //Not necessary - for programatic weight reduction
-  [" B", "[0-9]B"],
+  [" B$", "[0-9]B"],
   ["Algebra C", "[0-9]C"]
 ]
 

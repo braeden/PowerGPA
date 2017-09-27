@@ -3,6 +3,7 @@ $(".gpa").append("<p id='gpaTitle'>GPA (W/UW):</p>");
 var gradesArray = [];
 var headerArray = [];
 
+//Store body w/ grades into array
 $("tbody:first tr").each(function() {
     var arrayOfThisRow = [];
     var tableData = $(this).find('td');
@@ -11,6 +12,7 @@ $("tbody:first tr").each(function() {
         gradesArray.push(arrayOfThisRow);
     }
 });
+//Store header rows into array
 $("tbody:first tr").each(function() {
     var arrayOfThisRow = [];
     var tableData = $(this).find('th');
@@ -20,17 +22,15 @@ $("tbody:first tr").each(function() {
     }
 });
 
-var headers = ["Q1","Q2","Q3","Q4","S1","S2","F1"]; //To access the column values from
-var colIndexArray = [12,14,16,18,15,19,20]; //Default 
-//Course,Q1,Q2,Q3,Q4,S1,S2
-var courseRow = 11; //Default
-var offsetCount = 8;
+var headers = ["Q1","Q2","Q3","Q4","S1","S2","F1"]; //Column headers to access grades from
+var colIndexArray = [12,14,16,18,15,19,20]; //Default header position offsets
+var courseCol = 11; //Default course column to search names from
+var offsetCount = 8; //Default offset between the header and body tables. (8 for 2 weeks worth of days)
 
-var gpaArrays = [[]]; //2d array
+var gpaArrays = [[]]; //2d array for weighted GPA
 var gpaArraysUw = [[]];
-//Q1,Q2,Q3,Q4,S1,S2
 
-var weighting=0;
+var weighting=0; //Default weighting on classes
 
 for(var j = 0; j < headerArray[1].length; j++) {
   if (typeof headerArray[1][j] != 'undefined') {
@@ -40,7 +40,7 @@ for(var j = 0; j < headerArray[1].length; j++) {
       }
     }
     if (headerArray[1][j].toString().replace(/\s/g) == "Course") {
-        courseRow = j+offsetCount;
+        courseCol = j+offsetCount;
     }
   }
 }
@@ -51,7 +51,7 @@ for(var j = 0; j < headerArray[1].length; j++) {
 var pattern = [
   ["A.P.", "AP", "Calculus", "Diff"],
   [" Honors", "[0-9]H"],
-  ["[0-9]A", "Contemp"], //Not necessary - for programatic weight reduction
+  ["[0-9]A", "Contemp"], //Necessary for programatic weight reduction
   [" B$", "[0-9]B"],
   ["Algebra C", "[0-9]C"]
 ]
@@ -66,7 +66,7 @@ for(var i = 0; i < gradesArray.length; i++) {
         var col = j;
         for (var p = 0; p<pattern.length; p++) {
           var re = new RegExp(pattern[p].join("|"), "i");
-          if (re.test(gradesArray[i][courseRow])) {
+          if (re.test(gradesArray[i][courseCol])) {
             weighting = 0.666-0.333*p;
           }
         } //AP=include in weighting //
@@ -81,13 +81,10 @@ averageGPA();
 console.log(gpaArrays)
 
 function getGrades(rowIndex, weighting, colIndex, storageIndex) {
-  //Q1
-//olIndexArray[storageIndex]
   if (typeof gpaArrays[storageIndex] == 'undefined') {
     gpaArrays[storageIndex] = new Array();
     gpaArraysUw[storageIndex] = new Array();
   }
-  //console.log(rowIndex, col);
   if (gradesArray[rowIndex][colIndex].match(/\d+/g) != null) {
     //Contains grades
     //StorageIndex = where in the GPA array to store, and which index in the columnarray to grab from
@@ -117,7 +114,6 @@ function calculateClassGPA(letterGrade, weighting) {
       }
     }
   }
-  //console.log(g);
   return(g);
 
 }
@@ -149,11 +145,3 @@ function displayGPA(name, gpa, gpaUw) {
   gpaUw = gpaUw.toFixed(2);
   $(".gpa").append("<span tabindex='0'>" + name + ": " + gpa + "/" + gpaUw + "</span></br>");
 }
-//j = col
-//i= row
-//j = 11 = class
-//Q1 = j12
-//q2 = j14
-//S1= j15
-//3 = 16, 4=17, s2=18, f1=19
-//Honors: " honors", " #H", "AP", "A.P."

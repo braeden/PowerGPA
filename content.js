@@ -51,7 +51,7 @@ for(var j = 0; j < headerArray[1].length; j++) {
 var pattern = [
   ["A.P.", "AP", "Calculus", "Diff"],
   [" Honors", "[0-9]H", "HNRS"],
-  ["[0-9]A", "Contemp", "Acapella"], //Necessary for programatic weight reduction
+  ["[0-9]A", "Contemp", "Choir"], //Necessary for programatic weight reduction
   [" B$", "[0-9]B"],
   ["Algebra C", "[0-9]C"]
 ]

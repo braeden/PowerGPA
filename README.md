@@ -1,4 +1,4 @@
-# PowerGPA
+# [PowerGPA](https://chrome.google.com/webstore/detail/powergpa/bdbhephmimagiadamkkipjedljddgncb?hl=en)
 
 Calculate a Powerschool GPA with a content script, even if it is disabled.
 

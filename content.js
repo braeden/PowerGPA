@@ -2,26 +2,6 @@ $("#afterH1").append("<div class='gpa'></div>")
 $(".gpa").append("<p id='gpaTitle'>GPA (W/UW):</p>");
 var gradesArray = [];
 var headerArray = [];
-
-//Store body w/ grades into array
-$("tbody:first tr").each(function() {
-    var arrayOfThisRow = [];
-    var tableData = $(this).find('td');
-    if (tableData.length > 0) {
-        tableData.each(function() { arrayOfThisRow.push($(this).text()); });
-        gradesArray.push(arrayOfThisRow);
-    }
-});
-//Store header rows into array
-$("tbody:first tr").each(function() {
-    var arrayOfThisRow = [];
-    var tableData = $(this).find('th');
-    if (tableData.length > 0) {
-        tableData.each(function() { arrayOfThisRow.push($(this).text()); });
-        headerArray.push(arrayOfThisRow);
-    }
-});
-
 var headers = ["Q1","Q2","Q3","Q4","S1","S2","F1"]; //Column headers to access grades from
 var colIndexArray = [12,14,16,18,15,19,20]; //Default header position offsets
 var courseCol = 11; //Default course column to search names from
@@ -32,53 +12,106 @@ var gpaArraysUw = [[]];
 
 var weighting=0; //Default weighting on classes
 
-for(var j = 0; j < headerArray[1].length; j++) {
-  if (typeof headerArray[1][j] != 'undefined') {
-    for (var h = 0; h < headers.length; h++) {
-      if (headerArray[1][j].toString().replace(/\s/g) == headers[h]) {
-          colIndexArray[h] = j+offsetCount; //Day count offset in table
-      }
-    }
-    if (headerArray[1][j].toString().replace(/\s/g) == "Course") {
-        courseCol = j+offsetCount;
-    }
-  }
-}
-
-
-
-
 var pattern = [
-  ["A.P.", "AP", "Calculus", "Diff"],
-  [" Honors", "[0-9]H", "HNRS"],
-  ["[0-9]A", "Contemp", "Choir"], //Necessary for programatic weight reduction
-  [" B$", "[0-9]B"],
-  ["Algebra C", "[0-9]C"]
+  ["P"],
+  ["H"],
+  ["A"], //Necessary for programatic weight reduction
+  ["B"],
+  ["C"]
 ]
 
+var classesArray;
 
-for(var i = 0; i < gradesArray.length; i++) {
-  for(var j = 0; j < gradesArray[i].length; j++) {
-    weighting=0;
-    for (var k = 0; k<colIndexArray.length; k++) {
-      if (j==colIndexArray[k]) {
-        var storageIndex = k;
-        var col = j;
-        for (var p = 0; p<pattern.length; p++) {
-          var re = new RegExp(pattern[p].join("|"), "i");
-          if (re.test(gradesArray[i][courseCol])) {
-            weighting = 0.666-0.333*p;
-          }
-        } //AP=include in weighting //
-        getGrades(i,weighting,col,storageIndex);
+htmlToArrays();
+setupColumns();
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', chrome.extension.getURL('classes.csv'), true);
+xhr.onreadystatechange = function() {
+    if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+      classesArray = CSVToArray(xhr.responseText);
+      beginParsing();
+      //console.log(xhr.responseText);
+    }
+};
+xhr.send();
+
+function beginParsing() {
+  for(var i = 0; i < gradesArray.length; i++) {
+    for(var j = 0; j < gradesArray[i].length; j++) {
+      weighting=0;
+      for (var k = 0; k<colIndexArray.length; k++) {
+        if (j==colIndexArray[k]) {
+          var storageIndex = k;
+          var col = j;
+          weighting = getWeighting(i);
+          getGrades(i,weighting,col,storageIndex);
+        }
+      }
+    }
+  }
+
+  averageGPA();
+
+  console.log(gpaArrays)
+}
+
+
+function htmlToArrays() {
+  //Store body w/ grades into array
+  $("tbody:first tr").each(function() {
+      var arrayOfThisRow = [];
+      var tableData = $(this).find('td');
+      if (tableData.length > 0) {
+          tableData.each(function() { arrayOfThisRow.push($(this).text()); });
+          gradesArray.push(arrayOfThisRow);
+      }
+  });
+  //Store header rows into array
+  $("tbody:first tr").each(function() {
+      var arrayOfThisRow = [];
+      var tableData = $(this).find('th');
+      if (tableData.length > 0) {
+          tableData.each(function() { arrayOfThisRow.push($(this).text()); });
+          headerArray.push(arrayOfThisRow);
+      }
+  });
+
+}
+
+
+function getWeighting(row) {
+  for (var i = 0; i<classesArray.length; i++) {
+    if (gradesArray[row][courseCol].toLowerCase().includes(classesArray[i][0].toLowerCase())) {
+      //Class name is in the class list array
+      for (var p = 0; p<pattern.length; p++) {
+        var re = new RegExp(pattern[p]);
+        if (re.test(classesArray[i][1])) {
+          //academic class
+          weighting = 0.666-0.333*p;
+          return weighting;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function setupColumns() {
+  for(var j = 0; j < headerArray[1].length; j++) {
+    if (typeof headerArray[1][j] != 'undefined') {
+      for (var h = 0; h < headers.length; h++) {
+        if (headerArray[1][j].toString().replace(/\s/g) == headers[h]) {
+            colIndexArray[h] = j+offsetCount; //Day count offset in table
+        }
+      }
+      if (headerArray[1][j].toString().replace(/\s/g) == "Course") {
+          courseCol = j+offsetCount;
       }
     }
   }
 }
 
-averageGPA();
-
-console.log(gpaArrays)
 
 function getGrades(rowIndex, weighting, colIndex, storageIndex) {
   if (typeof gpaArrays[storageIndex] == 'undefined') {
@@ -89,7 +122,9 @@ function getGrades(rowIndex, weighting, colIndex, storageIndex) {
     //Contains grades
     //StorageIndex = where in the GPA array to store, and which index in the columnarray to grab from
     letterGrade = gradesArray[rowIndex][colIndex].toString().replace(/[^A-Z+-]/g,'');
-    gpaArrays[storageIndex].push(calculateClassGPA(letterGrade, weighting));
+    if (weighting != null) { //An academic class
+      gpaArrays[storageIndex].push(calculateClassGPA(letterGrade, weighting));
+    }
     gpaArraysUw[storageIndex].push(calculateClassGPA(letterGrade, 0));
   } else {
     gpaArrays[storageIndex].push(-1);
@@ -144,4 +179,69 @@ function displayGPA(name, gpa, gpaUw) {
   gpa = gpa.toFixed(2);
   gpaUw = gpaUw.toFixed(2);
   $(".gpa").append("<span tabindex='0'>" + name + ": " + gpa + "/" + gpaUw + "</span></br>");
+}
+
+// Credit: https://www.bennadel.com/blog/1504-ask-ben-parsing-csv-strings-with-javascript-exec-regular-expression-command.htm
+// This will parse a delimited string into an array of
+// arrays. The default delimiter is the comma, but this
+// can be overriden in the second argument.
+function CSVToArray( strData, strDelimiter ){
+    // Check to see if the delimiter is defined. If not,
+    // then default to comma.
+    strDelimiter = (strDelimiter || ",");
+    // Create a regular expression to parse the CSV values.
+    var objPattern = new RegExp(
+        (
+            // Delimiters.
+            "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+            // Quoted fields.
+            "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+            // Standard fields.
+            "([^\"\\" + strDelimiter + "\\r\\n]*))"
+        ),
+        "gi"
+        );
+    // Create an array to hold our data. Give the array
+    // a default empty first row.
+    var arrData = [[]];
+    // Create an array to hold our individual pattern
+    // matching groups.
+    var arrMatches = null;
+    // Keep looping over the regular expression matches
+    // until we can no longer find a match.
+    while (arrMatches = objPattern.exec( strData )){
+        // Get the delimiter that was found.
+        var strMatchedDelimiter = arrMatches[ 1 ];
+        // Check to see if the given delimiter has a length
+        // (is not the start of string) and if it matches
+        // field delimiter. If id does not, then we know
+        // that this delimiter is a row delimiter.
+        if (
+            strMatchedDelimiter.length &&
+            (strMatchedDelimiter != strDelimiter)
+            ){
+            // Since we have reached a new row of data,
+            // add an empty row to our data array.
+            arrData.push( [] );
+        }
+        // Now that we have our delimiter out of the way,
+        // let's check to see which kind of value we
+        // captured (quoted or unquoted).
+        if (arrMatches[ 2 ]){
+            // We found a quoted value. When we capture
+            // this value, unescape any double quotes.
+            var strMatchedValue = arrMatches[ 2 ].replace(
+                new RegExp( "\"\"", "g" ),
+                "\""
+                );
+        } else {
+            // We found a non-quoted value.
+            var strMatchedValue = arrMatches[ 3 ];
+        }
+        // Now that we have our value string, let's add
+        // it to the data array.
+        arrData[ arrData.length - 1 ].push( strMatchedValue );
+    }
+    // Return the parsed data.
+    return( arrData );
 }

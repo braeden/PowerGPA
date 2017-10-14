@@ -1,5 +1,5 @@
 $("#afterH1").append("<div class='gpa'></div>")
-$(".gpa").append("<p id='gpaTitle'>GPA (W/UW):</p>");
+$(".gpa").append("<p id='gpaTitle'>GPA <br>(Academic/UW):</p>");
 var gradesArray = [];
 var headerArray = [];
 var headers = ["Q1","Q2","Q3","Q4","S1","S2","F1"]; //Column headers to access grades from
@@ -53,7 +53,8 @@ function beginParsing() {
 
   averageGPA();
 
-  console.log(gpaArrays)
+  console.log(gpaArrays);
+  console.log(gpaArraysUw);
 }
 
 

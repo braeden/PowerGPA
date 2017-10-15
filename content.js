@@ -15,27 +15,31 @@ var weighting=0; //Default weighting on classes
 var pattern = [
   ["P"],
   ["H"],
-  ["A"], //Necessary for programatic weight reduction
-  ["B"],
+  ["A"], // Patterns to match the weighting of classes.csv
+  ["B"], // Programatic weighting reduction (order matters)
   ["C"]
 ]
 
-var classesArray;
 
 htmlToArrays();
 setupColumns();
 
+//
+// Make an XML request for the CSV file and put it in an array
+//
 var xhr = new XMLHttpRequest();
 xhr.open('GET', chrome.extension.getURL('classes.csv'), true);
 xhr.onreadystatechange = function() {
     if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-      classesArray = CSVToArray(xhr.responseText);
+      var classesArray = CSVToArray(xhr.responseText);
       beginParsing();
-      //console.log(xhr.responseText);
     }
 };
 xhr.send();
 
+//
+// Main function for getting and calculating grades
+//
 function beginParsing() {
   for(var i = 0; i < gradesArray.length; i++) {
     for(var j = 0; j < gradesArray[i].length; j++) {
@@ -57,7 +61,9 @@ function beginParsing() {
   console.log(gpaArraysUw);
 }
 
-
+//
+// Parse the header HTML table and the main table body into two 2d arrays 
+//
 function htmlToArrays() {
   //Store body w/ grades into array
   $("tbody:first tr").each(function() {
@@ -80,7 +86,13 @@ function htmlToArrays() {
 
 }
 
-
+//
+// Based on a row index of existing classes, find the weighting if they're academic
+//
+// Returns:
+//  int  - for weighting
+//  null - if it's not academic
+//
 function getWeighting(row) {
   for (var i = 0; i<classesArray.length; i++) {
     if (gradesArray[row][courseCol].toLowerCase().includes(classesArray[i][0].toLowerCase())) {
@@ -98,6 +110,9 @@ function getWeighting(row) {
   return null;
 }
 
+//
+// Programatically find the column index of each header that we want eg. Semester 1, Final 1
+//
 function setupColumns() {
   for(var j = 0; j < headerArray[1].length; j++) {
     if (typeof headerArray[1][j] != 'undefined') {
@@ -113,7 +128,9 @@ function setupColumns() {
   }
 }
 
-
+//
+// Organize the gathering of grades and 2d array assignment of individual class GPAs
+//
 function getGrades(rowIndex, weighting, colIndex, storageIndex) {
   if (typeof gpaArrays[storageIndex] == 'undefined') {
     gpaArrays[storageIndex] = new Array();
@@ -133,6 +150,12 @@ function getGrades(rowIndex, weighting, colIndex, storageIndex) {
   }
 }
 
+//
+// Coverts a letter grade to a GPA with included weighting and extension
+//
+// Returns:
+//  int - the converted GPA for a given letter grade and weighting
+//
 function calculateClassGPA(letterGrade, weighting) {
   var g = 0.0;
   //console.log(letterGrade)
@@ -154,8 +177,10 @@ function calculateClassGPA(letterGrade, weighting) {
 
 }
 
+//
+// Average both weighted and unweighted 2d GPA arrays
+//
 function averageGPA() {
-  //Q1
   for (var g=0; g<gpaArrays.length; g++) {
     var l = gpaArrays[g].length;
     var classTotal = 0;
@@ -176,6 +201,9 @@ function averageGPA() {
   }
 }
 
+//
+// Push the unweighted and weighted GPAs to the page
+//
 function displayGPA(name, gpa, gpaUw) {
   gpa = gpa.toFixed(2);
   gpaUw = gpaUw.toFixed(2);
@@ -183,6 +211,7 @@ function displayGPA(name, gpa, gpaUw) {
 }
 
 // Credit: https://www.bennadel.com/blog/1504-ask-ben-parsing-csv-strings-with-javascript-exec-regular-expression-command.htm
+
 // This will parse a delimited string into an array of
 // arrays. The default delimiter is the comma, but this
 // can be overriden in the second argument.

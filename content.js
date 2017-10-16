@@ -24,14 +24,17 @@ var pattern = [
 htmlToArrays();
 setupColumns();
 
+var classesArray = [[]];
+
 //
+
 // Make an XML request for the CSV file and put it in an array
 //
 var xhr = new XMLHttpRequest();
 xhr.open('GET', chrome.extension.getURL('classes.csv'), true);
 xhr.onreadystatechange = function() {
     if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-      var classesArray = CSVToArray(xhr.responseText);
+      classesArray = CSVToArray(xhr.responseText);
       beginParsing();
     }
 };

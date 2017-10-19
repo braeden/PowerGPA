@@ -27,7 +27,6 @@ setupColumns();
 var classesArray = [[]];
 
 //
-
 // Make an XML request for the CSV file and put it in an array
 //
 var xhr = new XMLHttpRequest();
@@ -145,6 +144,8 @@ function getGrades(rowIndex, weighting, colIndex, storageIndex) {
     letterGrade = gradesArray[rowIndex][colIndex].toString().replace(/[^A-Z+-]/g,'');
     if (weighting != null) { //An academic class
       gpaArrays[storageIndex].push(calculateClassGPA(letterGrade, weighting));
+    } else {
+      gpaArrays[storageIndex].push(-1);
     }
     gpaArraysUw[storageIndex].push(calculateClassGPA(letterGrade, 0));
   } else {
@@ -187,17 +188,21 @@ function averageGPA() {
   for (var g=0; g<gpaArrays.length; g++) {
     var l = gpaArrays[g].length;
     var classTotal = 0;
+    var classTotalUw = 0
     var GpaTotal = 0.0;
     var GpaTotalUw = 0.0;
     for (var i=0; i<l; i++) {
       if (gpaArrays[g][i] != -1) {
         GpaTotal+=gpaArrays[g][i];
-        GpaTotalUw+=gpaArraysUw[g][i];
         classTotal++;
+      }
+      if (gpaArraysUw[g][i] != -1) {
+        GpaTotalUw+=gpaArraysUw[g][i];
+        classTotalUw++;
       }
     }
     var average = GpaTotal/classTotal;
-    var averageUw = GpaTotalUw/classTotal;
+    var averageUw = GpaTotalUw/classTotalUw;
     if (GpaTotal>0) {
       displayGPA(headerArray[1][colIndexArray[g]-8].toString(), average, averageUw);
     }

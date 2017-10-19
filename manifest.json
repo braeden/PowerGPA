@@ -3,7 +3,7 @@
 
   "name": "PowerGPA",
   "description": "This extension calculates your current GPA",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "browser_action": {"default_icon": "smallicon.png"},
   "icons": {
     "128": "smallicon.png",
